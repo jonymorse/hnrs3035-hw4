@@ -7,10 +7,9 @@ venv/
 __pycache__/
 
 # Ignore data and results
-
+/data
 /_deprecated/
-error_analysis.py
-
+/chroma_db
 # Ignore environment dependencies
 requirements.txt
 

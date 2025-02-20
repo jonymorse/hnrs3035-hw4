@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 # Load API key
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY_JOMO")
 
 if not OPENAI_API_KEY:
     raise ValueError("❌ OPENAI_API_KEY not found. Please check your .env file.")
@@ -13,8 +13,8 @@ if not OPENAI_API_KEY:
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Batch ID (Replace with your actual Batch ID)
-BATCH_ID = "batch_67ae901eebe88190af89ed5c78dadc74"  # ✅ Replace with your actual Batch ID
-
+#BATCH_ID = "batch_67b7b1cd76f481909d0aef65d661c4e5"  # ✅ Replace with your actual Batch ID
+BATCH_ID = "batch_67b7ac36df308190aab2a321fe093ef9"
 # Retrieve batch details
 print("⏳ Retrieving batch details, please wait...")
 

@@ -14,7 +14,7 @@ if not OPENAI_API_KEY:
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Define batch ID (replace with actual ID)
-BATCH_ID = "batch_67ad3d5ae3248190ac851067b7eb8727"
+BATCH_ID = "batch_67b67365901c8190b32e6dd7c00e13e2"
 
 # Retrieve batch details
 batch_details = client.batches.retrieve(BATCH_ID)

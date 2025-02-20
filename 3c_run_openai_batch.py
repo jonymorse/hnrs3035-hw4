@@ -1,4 +1,5 @@
 import openai
+import json
 import os
 import time
 from dotenv import load_dotenv
@@ -15,10 +16,10 @@ client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Paths
 DATA_DIR = "data"
-batch_input_path = os.path.join(DATA_DIR, "eval_batch_input.jsonl")
+batch_input_path = os.path.join(DATA_DIR, "gpt_batch_requests.jsonl")
+batch_output_path = os.path.join(DATA_DIR, "generated_answers.json")
 
-# Step 1: Upload batch input file
-print("⏳ Uploading batch input file...")
+# Step 1: Upload File to OpenAI
 uploaded_file = client.files.create(
     file=open(batch_input_path, "rb"),
     purpose="batch"
@@ -26,8 +27,7 @@ uploaded_file = client.files.create(
 file_id = uploaded_file.id
 print(f"✅ File uploaded successfully! File ID: {file_id}")
 
-# Step 2: Submit batch job
-print("⏳ Submitting batch job...")
+# Step 2: Submit Batch Job
 batch = client.batches.create(
     input_file_id=file_id,
     endpoint="/v1/chat/completions",
@@ -36,25 +36,26 @@ batch = client.batches.create(
 batch_id = batch.id
 print(f"✅ Batch job submitted! Batch ID: {batch_id}")
 
-# Step 3: Monitor batch status
-print("⏳ Waiting for batch processing...")
+# Step 3: Monitor Batch Job
+print("⏳ Waiting for batch completion...")
 while True:
     batch_status = client.batches.retrieve(batch_id)
     print(f"🔄 Batch Status: {batch_status.status}")
-
+    
     if batch_status.status in ["completed", "failed", "expired", "cancelled"]:
         break  # Exit loop when batch processing is complete
+    
+    time.sleep(60)  # Wait 1 minute before checking again
 
-    time.sleep(30)  # Wait 30 seconds before checking again
-
-# Step 4: Final result
+# Step 4: Retrieve Results
 if batch_status.status == "completed":
-    print(f"✅ Batch completed successfully! Output file ID: {batch_status.output_file_id}")
-elif batch_status.status == "failed":
-    print("❌ Batch processing failed.")
-elif batch_status.status == "expired":
-    print("⚠️ Batch expired before completion.")
-elif batch_status.status == "cancelled":
-    print("❌ Batch was cancelled.")
+    output_file_id = batch_status.output_file_id
+    file_response = client.files.content(output_file_id)
+    file_contents = file_response.text()
 
-print("🚀 Done!")
+    with open(batch_output_path, "w") as file:
+        file.write(file_contents)
+    
+    print(f"✅ Results saved to {batch_output_path}")
+else:
+    print(f"❌ Batch failed with status: {batch_status.status}")
